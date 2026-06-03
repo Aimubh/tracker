@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# Debug files (generated during development)
+debug_*.py
+debug_*.html
+blinkit_*.html
+blinkit_*.json
+amazon_debug.html
+blinkit_snippet.txt
+
+# Flask
+instance/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
