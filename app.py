@@ -4,13 +4,32 @@ Run: python app.py  →  open http://localhost:5000
 """
 
 import asyncio
+import time
+from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 
-from scrapers.catalog import get_all_products
+from scrapers.catalog import get_all_products, fetch_all_product_urls
 from scrapers.amazon import scrape_amazon
 from analyzer import analyze
 
 app = Flask(__name__)
+
+# ── Server-side product cache ─────────────────────────────────────────────────
+_product_cache = {
+    "products": [],
+    "last_synced": None,   # epoch timestamp
+    "count": 0,
+}
+
+
+def _refresh_products() -> dict:
+    """Fetch fresh products from Shopify API and update the cache."""
+    products = fetch_all_product_urls()
+    _product_cache["products"] = products
+    _product_cache["last_synced"] = time.time()
+    _product_cache["count"] = len(products)
+    print(f"[Cache] Refreshed — {len(products)} products at {datetime.now().strftime('%H:%M:%S')}")
+    return _product_cache
 
 
 @app.route("/")
@@ -20,21 +39,29 @@ def index():
 
 @app.route("/api/products", methods=["GET"])
 def api_products():
-    """Scrape lazerbelieve.com live and return all products."""
+    """
+    Always fetches fresh products from lazerbelieve.com on every call.
+    This ensures newly added products appear immediately when the page loads.
+    """
     try:
-        products = asyncio.run(get_all_products())
-        return jsonify([
-            {
-                "title": p["title"],
-                "url": p["url"],
-                "price": p["price"],
-                "category": p["category"],
-                "amazon_keyword": p["amazon_keyword"],
-                "image_count": p["image_count"],
-                "description_word_count": p["description_word_count"],
-            }
-            for p in products
-        ])
+        cache = _refresh_products()
+        products = cache["products"]
+        return jsonify({
+            "products": [
+                {
+                    "title": p["title"],
+                    "url": p["url"],
+                    "price": p["price"],
+                    "category": p["category"],
+                    "amazon_keyword": p["amazon_keyword"],
+                    "image_count": p["image_count"],
+                    "description_word_count": p["description_word_count"],
+                }
+                for p in products
+            ],
+            "count": cache["count"],
+            "last_synced": datetime.fromtimestamp(cache["last_synced"]).strftime("%d %b %Y, %I:%M %p"),
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

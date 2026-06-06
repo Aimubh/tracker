@@ -28,6 +28,36 @@
       border-radius: 8px; font-size: 0.92rem; background: white; min-width: 200px;
     }
     .field select:focus, .field input:focus { outline: none; border-color: #e94560; }
+
+    /* Searchable dropdown */
+    .search-dropdown { position: relative; min-width: 320px; }
+    .search-dropdown input {
+      width: 100%; padding: 9px 36px 9px 14px;
+      border: 1.5px solid #ddd; border-radius: 8px;
+      font-size: 0.92rem; background: white; cursor: pointer;
+    }
+    .search-dropdown input:focus { outline: none; border-color: #e94560; }
+    .search-dropdown .dd-arrow {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      pointer-events: none; color: #999; font-size: 0.8rem;
+    }
+    .dd-list {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: white; border: 1.5px solid #e94560; border-radius: 8px;
+      max-height: 280px; overflow-y: auto; z-index: 999;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12); display: none;
+    }
+    .dd-list.open { display: block; }
+    .dd-item {
+      padding: 10px 14px; cursor: pointer; font-size: 0.88rem;
+      border-bottom: 1px solid #f5f5f5; display: flex; flex-direction: column; gap: 2px;
+    }
+    .dd-item:last-child { border-bottom: none; }
+    .dd-item:hover, .dd-item.active { background: #fff5f7; }
+    .dd-item .dd-title { font-weight: 500; color: #1a1a2e; line-height: 1.3; }
+    .dd-item .dd-meta { font-size: 0.78rem; color: #888; }
+    .dd-item mark { background: #ffe5ea; color: #c62828; border-radius: 2px; padding: 0 1px; }
+    .dd-empty { padding: 14px; text-align: center; color: #aaa; font-size: 0.88rem; }
     .btn {
       padding: 10px 26px; background: #e94560; color: white;
       border: none; border-radius: 8px; font-size: 0.92rem;
@@ -153,6 +183,22 @@
     .empty { text-align: center; padding: 48px 20px; color: #888; }
     .empty .icon { font-size: 2.5rem; margin-bottom: 12px; }
     .empty p { font-size: 0.95rem; }
+
+    /* Sync bar */
+    .sync-bar {
+      background: #f8f8f8; border-bottom: 1px solid #eee;
+      padding: 6px 32px; display: flex; align-items: center;
+      gap: 10px; font-size: 0.78rem; color: #888;
+    }
+    .sync-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #ccc; flex-shrink: 0;
+    }
+    .sync-dot.syncing { background: #ff9800; animation: pulse 1s infinite; }
+    .sync-dot.synced  { background: #4caf50; }
+    .sync-dot.error   { background: #e94560; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .sync-bar strong { color: #1a1a2e; }
   </style>
 </head>
 <body>
@@ -164,12 +210,20 @@
   </div>
 </header>
 
+<div class="sync-bar">
+  <div class="sync-dot" id="syncDot"></div>
+  <span id="syncMsg">Syncing products from lazerbelieve.com...</span>
+</div>
+
 <div class="top-bar">
   <div class="field">
     <label>Your Product</label>
-    <select id="productSelect" onchange="onProductChange()">
-      <option value="">— Loading products from your website... —</option>
-    </select>
+    <div class="search-dropdown" id="productDropdown">
+      <input type="text" id="productSearch" placeholder="Loading products..." autocomplete="off"
+             oninput="filterProducts()" onfocus="openDropdown()" onblur="closeDropdown()" readonly />
+      <span class="dd-arrow">▼</span>
+      <div class="dd-list" id="ddList"></div>
+    </div>
   </div>
   <div class="field">
     <label>Search Keyword</label>
@@ -184,7 +238,7 @@
     </select>
   </div>
   <button class="btn" id="analyzeBtn" onclick="runAnalysis()" disabled>Analyze</button>
-  <button class="btn-secondary" id="refreshBtn" onclick="loadProducts()">Refresh Products</button>
+  <button class="btn-secondary" id="refreshBtn" onclick="refreshProducts()">↻ Sync Now</button>
 </div>
 
 <div class="container">
@@ -278,42 +332,205 @@
 
 <script>
 let allProducts = [];
+let selectedProduct = null;
+let ddOpen = false;
 
 // ── Load products on page load ──────────────────────────────────────────────
 window.onload = () => loadProducts();
 
 async function loadProducts() {
-  showStatus("loading", "Scanning lazerbelieve.com for all products...");
+  const searchInput = document.getElementById("productSearch");
+  const syncDot = document.getElementById("syncDot");
+  const syncMsg = document.getElementById("syncMsg");
+
+  // Reset state
+  searchInput.placeholder = "Syncing products...";
+  searchInput.readOnly = true;
   document.getElementById("analyzeBtn").disabled = true;
+  syncDot.className = "sync-dot syncing";
+  syncMsg.innerHTML = "Syncing products from <strong>lazerbelieve.com</strong>...";
+
   try {
     const res = await fetch("/api/products");
     const data = await res.json();
-    if (data.error) { showStatus("error", data.error); return; }
 
-    allProducts = data;
-    const sel = document.getElementById("productSelect");
-    sel.innerHTML = '<option value="">— Select a product —</option>';
-    data.forEach((p, i) => {
-      const opt = document.createElement("option");
-      opt.value = i;
-      opt.textContent = `${p.title} — ₹${p.price}`;
-      sel.appendChild(opt);
-    });
+    if (data.error) {
+      syncDot.className = "sync-dot error";
+      syncMsg.innerHTML = `Sync failed: ${data.error}`;
+      showStatus("error", data.error);
+      return;
+    }
+
+    allProducts = data.products;
+    const count = data.count;
+    const lastSynced = data.last_synced;
+
+    searchInput.placeholder = `Search from ${count} products...`;
+    searchInput.readOnly = false;
+    renderDropdown(allProducts, "");
+
+    // Update sync bar
+    syncDot.className = "sync-dot synced";
+    syncMsg.innerHTML = `<strong>${count} products</strong> synced from lazerbelieve.com &nbsp;·&nbsp; Last updated: <strong>${lastSynced}</strong>`;
+
     hideStatus();
   } catch (err) {
+    syncDot.className = "sync-dot error";
+    syncMsg.textContent = "Sync failed — could not reach lazerbelieve.com";
     showStatus("error", "Failed to load products: " + err.message);
   }
 }
 
-function onProductChange() {
-  const idx = document.getElementById("productSelect").value;
-  if (idx === "") {
-    document.getElementById("analyzeBtn").disabled = true;
-    document.getElementById("productBanner").style.display = "none";
-    document.getElementById("keyword").value = "";
+async function refreshProducts() {
+  const btn = document.getElementById("refreshBtn");
+  btn.textContent = "Syncing...";
+  btn.disabled = true;
+  // Clear current selection
+  selectedProduct = null;
+  document.getElementById("productSearch").value = "";
+  document.getElementById("productBanner").style.display = "none";
+  document.getElementById("analyzeBtn").disabled = true;
+  await loadProducts();
+  btn.textContent = "↻ Sync Now";
+  btn.disabled = false;
+}
+
+// ── Searchable dropdown ──────────────────────────────────────────────────────
+// ── Smart recommendation engine ──────────────────────────────────────────────
+
+function scoreProduct(p, q) {
+  const title = p.title.toLowerCase();
+  const category = (p.category || "").toLowerCase();
+  const keyword = (p.amazon_keyword || "").toLowerCase();
+  const queryWords = q.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  let score = 0;
+  let matchType = "";   // "exact" | "starts" | "word" | "partial" | "category"
+
+  if (!q.trim()) return { score: 1, matchType: "all", highlight: p.title };
+
+  const qLower = q.toLowerCase().trim();
+
+  // Exact title match
+  if (title === qLower) { score = 100; matchType = "exact"; }
+  // Title starts with query
+  else if (title.startsWith(qLower)) { score = 90; matchType = "starts"; }
+  // All query words present in title
+  else if (queryWords.every(w => title.includes(w))) { score = 80; matchType = "word"; }
+  // Title contains the full query string
+  else if (title.includes(qLower)) { score = 70; matchType = "partial"; }
+  // Partial word matches — score by how many words match
+  else {
+    const matched = queryWords.filter(w => title.includes(w) || category.includes(w) || keyword.includes(w));
+    if (matched.length > 0) {
+      score = 40 + (matched.length / queryWords.length) * 20;
+      matchType = matched.some(w => category.includes(w)) ? "category" : "partial";
+    }
+  }
+
+  // Bonus: query word appears at start of a title word (e.g. "power" → "power bank")
+  queryWords.forEach(w => {
+    if (title.split(/\s+/).some(tw => tw.startsWith(w))) score += 5;
+  });
+
+  // Highlight matched portions
+  const highlight = highlightMatches(p.title, queryWords);
+
+  return { score, matchType, highlight };
+}
+
+function highlightMatches(title, queryWords) {
+  if (!queryWords.length) return title;
+  // Escape regex special chars in each word
+  const pattern = queryWords
+    .map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
+  return title.replace(new RegExp(`(${pattern})`, "gi"), "<mark>$1</mark>");
+}
+
+function renderDropdown(products, query) {
+  const list = document.getElementById("ddList");
+  const q = query.trim();
+
+  if (!q) {
+    // No query — show all products alphabetically
+    list.innerHTML = products.map(p => {
+      const idx = allProducts.indexOf(p);
+      const price = p.price ? `₹${p.price}` : "N/A";
+      return `<div class="dd-item" onmousedown="selectProduct(${idx})">
+        <span class="dd-title">${p.title}</span>
+        <span class="dd-meta">${price} &nbsp;·&nbsp; ${p.category}</span>
+      </div>`;
+    }).join("");
     return;
   }
+
+  // Score and rank every product
+  const scored = products
+    .map(p => ({ p, ...scoreProduct(p, q) }))
+    .filter(r => r.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (scored.length === 0) {
+    list.innerHTML = `<div class="dd-empty">No products found for "<strong>${q}</strong>"<br><small>Try a shorter keyword</small></div>`;
+    return;
+  }
+
+  const matchLabels = {
+    exact:    { text: "Exact match",   color: "#2e7d32", bg: "#e8f5e9" },
+    starts:   { text: "Best match",    color: "#1565c0", bg: "#e3f2fd" },
+    word:     { text: "All words",     color: "#6a1b9a", bg: "#f3e5f5" },
+    partial:  { text: "Related",       color: "#e65100", bg: "#fff3e0" },
+    category: { text: "Same category", color: "#00695c", bg: "#e0f2f1" },
+  };
+
+  list.innerHTML = scored.map(({ p, matchType, highlight, score }) => {
+    const idx = allProducts.indexOf(p);
+    const price = p.price ? `₹${p.price}` : "N/A";
+    const badge = matchLabels[matchType];
+    const badgeHtml = badge
+      ? `<span style="background:${badge.bg};color:${badge.color};padding:1px 7px;border-radius:99px;font-size:0.72rem;font-weight:600;margin-left:6px">${badge.text}</span>`
+      : "";
+    return `<div class="dd-item" onmousedown="selectProduct(${idx})">
+      <span class="dd-title">${highlight}${badgeHtml}</span>
+      <span class="dd-meta">${price} &nbsp;·&nbsp; ${p.category}</span>
+    </div>`;
+  }).join("");
+}
+
+function filterProducts() {
+  const q = document.getElementById("productSearch").value;
+  renderDropdown(allProducts, q);
+  document.getElementById("ddList").classList.add("open");
+  selectedProduct = null;
+  document.getElementById("analyzeBtn").disabled = true;
+  document.getElementById("productBanner").style.display = "none";
+}
+
+function openDropdown() {
+  if (allProducts.length === 0) return;
+  renderDropdown(allProducts, document.getElementById("productSearch").value);
+  document.getElementById("ddList").classList.add("open");
+  document.getElementById("productSearch").readOnly = false;
+  ddOpen = true;
+}
+
+function closeDropdown() {
+  setTimeout(() => {
+    document.getElementById("ddList").classList.remove("open");
+    ddOpen = false;
+    // If nothing selected, restore previous text or clear
+    if (!selectedProduct) {
+      document.getElementById("productSearch").value = "";
+    }
+  }, 150);
+}
+
+function selectProduct(idx) {
   const p = allProducts[idx];
+  selectedProduct = p;
+
+  document.getElementById("productSearch").value = p.title;
+  document.getElementById("ddList").classList.remove("open");
   document.getElementById("keyword").value = p.amazon_keyword;
   document.getElementById("analyzeBtn").disabled = false;
 
@@ -328,12 +545,11 @@ function onProductChange() {
 
 // ── Run analysis ────────────────────────────────────────────────────────────
 async function runAnalysis() {
-  const idx = document.getElementById("productSelect").value;
   const keyword = document.getElementById("keyword").value.trim();
   const platform = document.getElementById("platform").value;
-  if (idx === "" || !keyword) return;
+  if (!selectedProduct || !keyword) return;
 
-  const p = allProducts[idx];
+  const p = selectedProduct;
   const btn = document.getElementById("analyzeBtn");
   btn.disabled = true;
   btn.textContent = "Analyzing...";
