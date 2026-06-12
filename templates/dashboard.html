@@ -282,7 +282,7 @@
 
       <!-- Live competitors found -->
       <div class="section">
-        <h3>Top Competitors Found on Amazon</h3>
+        <h3 id="competitorListTitle">Top Competitors Found</h3>
         <div id="competitorList"></div>
       </div>
     </div>
@@ -625,14 +625,21 @@ function renderResults(data) {
   // Competitors
   const compDiv = document.getElementById("competitorList");
   compDiv.innerHTML = "";
+  document.getElementById("competitorListTitle").textContent =
+    `Top Competitors Found on ${platformLabel}`;
   (data.competitors || []).forEach((c, i) => {
     const stars = c.rating ? `⭐ ${c.rating}` : "No rating";
     const reviews = c.review_count ? `${c.review_count.toLocaleString()} reviews` : "No reviews";
     const price = c.price ? `₹${c.price}` : "N/A";
-    const link = c.url ? `<a class="comp-link" href="${c.url}" target="_blank">View on Amazon ↗</a>` : "";
+    const src = c.source || c.platform || "amazon";
+    const linkLabel = src === "blinkit" ? "View on Blinkit ↗" : "View on Amazon ↗";
+    const link = c.url ? `<a class="comp-link" href="${c.url}" target="_blank">${linkLabel}</a>` : "";
+    const platformBadge = src === "blinkit"
+      ? `<span style="background:#f0fdf4;color:#166534;padding:1px 8px;border-radius:99px;font-size:0.72rem;font-weight:600;margin-left:6px">Blinkit</span>`
+      : `<span style="background:#eff6ff;color:#1e40af;padding:1px 8px;border-radius:99px;font-size:0.72rem;font-weight:600;margin-left:6px">Amazon</span>`;
     compDiv.innerHTML += `
       <div class="comp-card">
-        <h4><span class="comp-rank">#${i+1}</span> ${c.title}</h4>
+        <h4><span class="comp-rank">#${i+1}</span> ${c.title}${platformBadge}</h4>
         <div class="comp-meta">
           <span>${price}</span>
           <span>${stars}</span>

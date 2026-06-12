@@ -111,11 +111,15 @@ def _parse_snippets(snippets: list, max_results: int) -> list[dict]:
         image = data.get("image", {}) or {}
         image_url = image.get("url", "") if isinstance(image, dict) else ""
 
-        # Product URL from click_action
+        # Product URL from click_action blinkit_deeplink (grofers://pdp?product_id=...)
+        product_url = ""
         click_action = data.get("click_action", {}) or {}
-        action_data = click_action.get("data", {}) if isinstance(click_action, dict) else {}
-        slug = action_data.get("slug", "") if isinstance(action_data, dict) else ""
-        product_url = f"https://blinkit.com/prn/{slug}" if slug else ""
+        if isinstance(click_action, dict):
+            deeplink = click_action.get("blinkit_deeplink", {}) or {}
+            deeplink_url = deeplink.get("url", "") if isinstance(deeplink, dict) else str(deeplink)
+            m = re.search(r"product_id=(\d+)", deeplink_url)
+            if m:
+                product_url = f"https://blinkit.com/prn/prid/{m.group(1)}"
 
         keywords = _extract_keywords(name + " " + variant)
 
