@@ -16,6 +16,21 @@
     header h1 { font-size: 1.3rem; font-weight: 700; }
     header span { font-size: 0.82rem; opacity: 0.6; }
 
+    /* Platform tabs */
+    .platform-tabs {
+      background: white; border-bottom: 1px solid #e0e0e0;
+      padding: 0 32px; display: flex; gap: 0;
+    }
+    .tab-btn {
+      padding: 14px 28px; border: none; background: none;
+      font-size: 0.92rem; font-weight: 600; cursor: pointer;
+      color: #888; border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: #1a1a2e; }
+    .tab-btn.active-amazon  { color: #1e40af; border-bottom-color: #1e40af; }
+    .tab-btn.active-blinkit { color: #166534; border-bottom-color: #166534; }
+
     .top-bar {
       background: white; padding: 16px 32px;
       border-bottom: 1px solid #e0e0e0;
@@ -23,14 +38,55 @@
     }
     .field { display: flex; flex-direction: column; gap: 4px; }
     .field label { font-size: 0.75rem; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
-    .field select, .field input {
-      padding: 9px 14px; border: 1.5px solid #ddd;
-      border-radius: 8px; font-size: 0.92rem; background: white; min-width: 200px;
+
+    /* Add-new-product */
+    .btn-add {
+      padding: 9px 16px; background: white; color: #1a1a2e;
+      border: 1.5px dashed #bbb; border-radius: 8px;
+      font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      transition: all 0.15s; height: 38px;
     }
-    .field select:focus, .field input:focus { outline: none; border-color: #e94560; }
+    .btn-add:hover { border-color: #e94560; color: #e94560; }
+    .btn-sync {
+      padding: 7px 14px; background: #1a1a2e; color: white;
+      border: none; border-radius: 8px; font-size: 0.82rem;
+      font-weight: 600; cursor: pointer;
+    }
+    .btn-sync:hover { background: #16213e; }
+    .btn-sync:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-upload {
+      padding: 7px 14px; background: #166534; color: white;
+      border: none; border-radius: 8px; font-size: 0.82rem;
+      font-weight: 600; cursor: pointer; user-select: none;
+    }
+    .btn-upload:hover { background: #14532d; }
+    .btn-upload.busy { opacity: 0.6; pointer-events: none; }
+    .add-box {
+      background: #fafbfc; border-bottom: 1px solid #e0e0e0;
+      padding: 0 32px; max-height: 0; overflow: hidden;
+      transition: max-height 0.2s ease, padding 0.2s ease;
+    }
+    .add-box.open { max-height: 200px; padding: 18px 32px; }
+    .add-box-inner { display: flex; flex-direction: column; gap: 8px; }
+    .add-box-inner label { font-size: 0.75rem; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+    .add-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .add-row input {
+      flex: 1; min-width: 320px; padding: 9px 14px;
+      border: 1.5px solid #ddd; border-radius: 8px; font-size: 0.92rem;
+    }
+    .add-row input:focus { outline: none; border-color: #e94560; }
+    .btn-add-cancel {
+      padding: 9px 16px; background: none; border: none;
+      color: #888; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-add-cancel:hover { color: #1a1a2e; }
+    .add-status { font-size: 0.83rem; min-height: 18px; }
+    .add-status.working { color: #92400e; }
+    .add-status.ok { color: #166534; }
+    .add-status.err { color: #b71c1c; }
 
     /* Searchable dropdown */
-    .search-dropdown { position: relative; min-width: 320px; }
+    .search-dropdown { position: relative; min-width: 360px; }
     .search-dropdown input {
       width: 100%; padding: 9px 36px 9px 14px;
       border: 1.5px solid #ddd; border-radius: 8px;
@@ -44,33 +100,31 @@
     .dd-list {
       position: absolute; top: calc(100% + 4px); left: 0; right: 0;
       background: white; border: 1.5px solid #e94560; border-radius: 8px;
-      max-height: 280px; overflow-y: auto; z-index: 999;
+      max-height: 300px; overflow-y: auto; z-index: 999;
       box-shadow: 0 8px 24px rgba(0,0,0,0.12); display: none;
     }
     .dd-list.open { display: block; }
     .dd-item {
-      padding: 10px 14px; cursor: pointer; font-size: 0.88rem;
-      border-bottom: 1px solid #f5f5f5; display: flex; flex-direction: column; gap: 2px;
+      padding: 10px 14px; cursor: pointer; font-size: 0.87rem;
+      border-bottom: 1px solid #f5f5f5;
     }
     .dd-item:last-child { border-bottom: none; }
-    .dd-item:hover, .dd-item.active { background: #fff5f7; }
+    .dd-item:hover { background: #fff5f7; }
     .dd-item .dd-title { font-weight: 500; color: #1a1a2e; line-height: 1.3; }
-    .dd-item .dd-meta { font-size: 0.78rem; color: #888; }
+    .dd-item .dd-meta  { font-size: 0.76rem; color: #999; margin-top: 2px; }
     .dd-item mark { background: #ffe5ea; color: #c62828; border-radius: 2px; padding: 0 1px; }
     .dd-empty { padding: 14px; text-align: center; color: #aaa; font-size: 0.88rem; }
+
     .btn {
-      padding: 10px 26px; background: #e94560; color: white;
+      padding: 10px 26px; color: white;
       border: none; border-radius: 8px; font-size: 0.92rem;
       font-weight: 600; cursor: pointer; transition: background 0.2s; align-self: flex-end;
     }
-    .btn:hover { background: #c73652; }
-    .btn:disabled { background: #bbb; cursor: not-allowed; }
-    .btn-secondary {
-      padding: 9px 18px; background: white; color: #1a1a2e;
-      border: 1.5px solid #ddd; border-radius: 8px; font-size: 0.88rem;
-      font-weight: 500; cursor: pointer; align-self: flex-end;
-    }
-    .btn-secondary:hover { border-color: #999; }
+    .btn-amazon  { background: #1e40af; }
+    .btn-amazon:hover  { background: #1e3a8a; }
+    .btn-blinkit { background: #166534; }
+    .btn-blinkit:hover { background: #14532d; }
+    .btn:disabled { background: #bbb !important; cursor: not-allowed; }
 
     .container { max-width: 1140px; margin: 0 auto; padding: 24px 20px; }
 
@@ -89,20 +143,18 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Product info banner */
+    /* Product banner */
     .product-banner {
       background: white; border-radius: 12px; padding: 18px 22px;
       margin-bottom: 20px; display: none;
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      border-left: 4px solid #e94560;
     }
-    .product-banner h3 { font-size: 1rem; margin-bottom: 6px; }
+    .product-banner.amazon  { border-left: 4px solid #1e40af; }
+    .product-banner.blinkit { border-left: 4px solid #166534; }
+    .product-banner h3 { font-size: 1rem; margin-bottom: 8px; }
     .product-banner .meta { display: flex; gap: 20px; font-size: 0.85rem; color: #555; flex-wrap: wrap; }
-    .product-banner .meta span strong { color: #1a1a2e; }
-    .kw-tag {
-      display: inline-block; background: #f0f4ff; color: #3949ab;
-      padding: 2px 10px; border-radius: 99px; font-size: 0.8rem; font-weight: 500;
-    }
+    .badge-amz { background:#eff6ff;color:#1e40af;padding:2px 10px;border-radius:99px;font-size:0.75rem;font-weight:700; }
+    .badge-blk { background:#f0fdf4;color:#166534;padding:2px 10px;border-radius:99px;font-size:0.75rem;font-weight:700; }
 
     /* Score hero */
     .score-hero {
@@ -123,7 +175,6 @@
     .score-hero-text h2 { font-size: 1.1rem; margin-bottom: 5px; }
     .score-hero-text p  { color: #666; font-size: 0.88rem; line-height: 1.5; }
 
-    /* Grid layout */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
     @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
 
@@ -136,11 +187,29 @@
     /* Score bars */
     .score-row { margin-bottom: 12px; }
     .score-row-hdr { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.85rem; }
-    .bar-bg { background: #f0f0f0; border-radius: 99px; height: 8px; }
+    .bar-bg   { background: #f0f0f0; border-radius: 99px; height: 8px; }
     .bar-fill { height: 8px; border-radius: 99px; transition: width 0.8s ease; }
     .bar-good   { background: #4caf50; }
     .bar-medium { background: #ff9800; }
     .bar-poor   { background: #e94560; }
+
+    /* Image comparison */
+    .img-compare-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 720px) { .img-compare-wrap { grid-template-columns: 1fr; } }
+    .img-side h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 4px; }
+    .img-side .sub { font-size: 0.76rem; color: #888; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .img-side a { color: #3949ab; text-decoration: none; }
+    .img-side a:hover { text-decoration: underline; }
+    .img-thumbs { display: flex; flex-wrap: wrap; gap: 7px; }
+    .img-thumb {
+      width: 72px; height: 72px; object-fit: cover;
+      border-radius: 6px; border: 1.5px solid #eee; background: #f5f5f5;
+    }
+    .img-verdict {
+      margin-top: 12px; padding: 8px 12px; border-radius: 8px; font-size: 0.83rem; font-weight: 500;
+    }
+    .img-verdict.good   { background: #e8f5e9; color: #2e7d32; }
+    .img-verdict.behind { background: #fce4ec; color: #c62828; }
 
     /* Gap table */
     .gap-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
@@ -153,10 +222,7 @@
     .diff-pos { color: #4caf50; font-weight: 600; }
 
     /* Competitors list */
-    .comp-card {
-      border: 1px solid #eee; border-radius: 10px; padding: 14px;
-      margin-bottom: 10px; font-size: 0.85rem;
-    }
+    .comp-card { border: 1px solid #eee; border-radius: 10px; padding: 14px; margin-bottom: 10px; font-size: 0.85rem; }
     .comp-card:last-child { margin-bottom: 0; }
     .comp-card h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
     .comp-meta { display: flex; gap: 14px; color: #555; flex-wrap: wrap; }
@@ -179,26 +245,60 @@
 
     .results-area { display: none; }
 
+    /* Roadmap to #1 */
+    .roadmap-section { border: 1.5px solid #ffe0b2; background: linear-gradient(180deg,#fffdf8,#fff); }
+    .roadmap-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .roadmap-summary { font-size: 0.88rem; color: #555; line-height: 1.55; margin: 8px 0 16px; }
+    .roadmap-step {
+      display: flex; gap: 14px; padding: 14px; margin-bottom: 10px;
+      border: 1px solid #eee; border-radius: 10px; background: white;
+    }
+    .roadmap-step:last-child { margin-bottom: 0; }
+    .rm-num {
+      flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+      background: #1a1a2e; color: white; font-weight: 700; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .rm-body { flex: 1; }
+    .rm-title { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .rm-detail { font-size: 0.82rem; color: #555; line-height: 1.55; }
+    .rm-tag { font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; text-transform: uppercase; }
+    .rm-area { background: #eef2ff; color: #3949ab; font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+    .tag-high { background: #fce4ec; color: #c62828; }
+    .tag-medium { background: #fff3e0; color: #e65100; }
+
+    /* AI rewrite */
+    .btn-ai {
+      padding: 9px 18px; border: none; border-radius: 8px; cursor: pointer;
+      font-size: 0.85rem; font-weight: 700; color: white;
+      background: linear-gradient(135deg,#7c3aed,#4f46e5);
+    }
+    .btn-ai:hover { filter: brightness(1.08); }
+    .btn-ai:disabled { opacity: 0.6; cursor: not-allowed; }
+    .ai-result {
+      margin-top: 18px; padding: 18px; border-radius: 10px;
+      background: #faf5ff; border: 1px solid #e9d5ff;
+    }
+    .ai-result h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6d28d9; margin: 14px 0 6px; }
+    .ai-result h4:first-child { margin-top: 0; }
+    .ai-result .ai-title { font-size: 0.95rem; font-weight: 700; line-height: 1.45; }
+    .ai-result ul { margin: 0 0 0 18px; }
+    .ai-result li { font-size: 0.85rem; line-height: 1.6; margin-bottom: 4px; }
+    .ai-result .ai-strategy { font-size: 0.86rem; line-height: 1.6; color: #444; }
+    .ai-kw { display: inline-block; background: #ede9fe; color: #5b21b6; padding: 2px 9px; border-radius: 99px; font-size: 0.78rem; margin: 3px 4px 0 0; }
+    .ai-err { font-size: 0.85rem; color: #b71c1c; }
+    .copy-btn { background: none; border: 1px solid #c4b5fd; color: #6d28d9; border-radius: 6px; font-size: 0.72rem; padding: 2px 8px; cursor: pointer; margin-left: 8px; }
+    .copy-btn:hover { background: #f3e8ff; }
+
     /* Empty state */
     .empty { text-align: center; padding: 48px 20px; color: #888; }
     .empty .icon { font-size: 2.5rem; margin-bottom: 12px; }
-    .empty p { font-size: 0.95rem; }
 
-    /* Sync bar */
-    .sync-bar {
-      background: #f8f8f8; border-bottom: 1px solid #eee;
-      padding: 6px 32px; display: flex; align-items: center;
-      gap: 10px; font-size: 0.78rem; color: #888;
+    /* Catalog stats bar */
+    .catalog-bar {
+      background: #f8f8f8; border-bottom: 1px solid #e8e8e8;
+      padding: 8px 32px; font-size: 0.82rem; color: #555;
     }
-    .sync-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #ccc; flex-shrink: 0;
-    }
-    .sync-dot.syncing { background: #ff9800; animation: pulse 1s infinite; }
-    .sync-dot.synced  { background: #4caf50; }
-    .sync-dot.error   { background: #e94560; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-    .sync-bar strong { color: #1a1a2e; }
   </style>
 </head>
 <body>
@@ -206,18 +306,44 @@
 <header>
   <div>
     <h1>Ranking Tracker</h1>
-    <span>Lazer Believe — Live Competitor Analysis (Amazon & Blinkit)</span>
+    <span>Lazer Believe — Live Competitor Analysis</span>
   </div>
 </header>
 
-<div class="sync-bar">
-  <div class="sync-dot" id="syncDot"></div>
-  <span id="syncMsg">Syncing products from lazerbelieve.com...</span>
+<!-- Catalog stats bar -->
+<div class="catalog-bar" id="catalogBar" style="display:flex;justify-content:space-between;align-items:center">
+  <div style="display:flex;gap:24px;align-items:center">
+    <span style="display:flex;align-items:center;gap:7px">
+      <span style="background:#eff6ff;color:#1e40af;padding:2px 10px;border-radius:99px;font-size:0.75rem;font-weight:700">Amazon</span>
+      <strong id="amazonCount">—</strong> products
+    </span>
+    <span style="display:flex;align-items:center;gap:7px">
+      <span style="background:#f0fdf4;color:#166534;padding:2px 10px;border-radius:99px;font-size:0.75rem;font-weight:700">Blinkit</span>
+      <strong id="blinkitCount">—</strong> products
+    </span>
+    <span style="color:#aaa">|</span>
+    <span>Total: <strong id="totalCount">—</strong></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px">
+    <span id="syncProgress" style="font-size:0.8rem;color:#1e40af"></span>
+    <span id="catalogMsg" style="font-size:0.78rem;color:#92400e"></span>
+    <label class="btn-upload" id="uploadLabel" title="Upload any .xlsx file (Amazon/Blinkit sheets)">
+      📁 Upload Excel
+      <input type="file" id="excelFile" accept=".xlsx,.xlsm" onchange="uploadExcel(this)" style="display:none" />
+    </label>
+    <button class="btn-sync" id="syncBtn" onclick="syncFromExcel()" title="Re-read the file already in your Downloads folder">⟳ Sync from Downloads</button>
+  </div>
+</div>
+
+<!-- Platform tabs -->
+<div class="platform-tabs">
+  <button class="tab-btn active-amazon" id="tabAmazon" onclick="switchTab('amazon')">Amazon India</button>
+  <button class="tab-btn" id="tabBlinkit" onclick="switchTab('blinkit')">Blinkit</button>
 </div>
 
 <div class="top-bar">
   <div class="field">
-    <label>Your Product</label>
+    <label id="dropdownLabel">Your Amazon Listing</label>
     <div class="search-dropdown" id="productDropdown">
       <input type="text" id="productSearch" placeholder="Loading products..." autocomplete="off"
              oninput="filterProducts()" onfocus="openDropdown()" onblur="closeDropdown()" readonly />
@@ -225,20 +351,22 @@
       <div class="dd-list" id="ddList"></div>
     </div>
   </div>
-  <div class="field">
-    <label>Search Keyword</label>
-    <input type="text" id="keyword" placeholder="Auto-filled from product" />
+  <button class="btn btn-amazon" id="analyzeBtn" onclick="runAnalysis()" disabled>Analyze</button>
+  <button class="btn-add" id="addToggleBtn" onclick="toggleAddBox()" title="Add a new product by URL">+ Add new product</button>
+</div>
+
+<!-- Add-new-product inline box -->
+<div class="add-box" id="addBox">
+  <div class="add-box-inner">
+    <label id="addBoxLabel">Paste a new Amazon product URL</label>
+    <div class="add-row">
+      <input type="url" id="addUrlInput" placeholder="https://www.amazon.in/dp/..."
+             autocomplete="off" oninput="onAddUrlInput()" onkeydown="if(event.key==='Enter')addProduct()" />
+      <button class="btn btn-amazon" id="addSubmitBtn" onclick="addProduct()" disabled>Scrape &amp; Add</button>
+      <button class="btn-add-cancel" onclick="toggleAddBox()">Cancel</button>
+    </div>
+    <div class="add-status" id="addStatus"></div>
   </div>
-  <div class="field">
-    <label>Platform</label>
-    <select id="platform">
-      <option value="amazon">Amazon</option>
-      <option value="blinkit">Blinkit</option>
-      <option value="both">Amazon + Blinkit</option>
-    </select>
-  </div>
-  <button class="btn" id="analyzeBtn" onclick="runAnalysis()" disabled>Analyze</button>
-  <button class="btn-secondary" id="refreshBtn" onclick="refreshProducts()">↻ Sync Now</button>
 </div>
 
 <div class="container">
@@ -249,28 +377,45 @@
   </div>
 
   <!-- Product banner -->
-  <div class="product-banner" id="productBanner">
-    <h3 id="bannerTitle"></h3>
+  <div class="product-banner amazon" id="productBanner">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span class="badge-amz" id="platformBadge">Amazon</span>
+      <h3 id="bannerTitle" style="margin:0"></h3>
+    </div>
     <div class="meta">
-      <span><strong>Price:</strong> <span id="bannerPrice"></span></span>
-      <span><strong>Images:</strong> <span id="bannerImages"></span></span>
-      <span><strong>Description:</strong> <span id="bannerDesc"></span> words</span>
-      <span><strong>Amazon keyword:</strong> <span class="kw-tag" id="bannerKw"></span></span>
+      <span><strong>Price:</strong> <span id="bannerPrice">—</span></span>
+      <span><strong>Rating:</strong> <span id="bannerRating">—</span></span>
+      <span><strong>Reviews:</strong> <span id="bannerReviews">—</span></span>
+      <span><strong>Images:</strong> <span id="bannerImages">—</span></span>
+    </div>
+    <div style="margin-top:8px;font-size:0.8rem">
+      <a id="bannerLink" href="#" target="_blank" style="color:#3949ab">View listing ↗</a>
     </div>
   </div>
 
   <div class="results-area" id="results">
 
-    <!-- Overall score -->
+    <!-- Score hero -->
     <div class="score-hero">
       <div class="score-circle" id="scoreCircle">
         <span class="num" id="scoreNum">—</span>
         <span class="lbl">/ 10</span>
       </div>
       <div class="score-hero-text">
-        <h2 id="scoreTitle">Overall Listing Score</h2>
+        <h2 id="scoreTitle">Overall Score</h2>
         <p id="scoreDesc"></p>
       </div>
+    </div>
+
+    <!-- Roadmap to #1 -->
+    <div class="section roadmap-section" id="roadmapSection" style="margin-bottom:20px;display:none">
+      <div class="roadmap-head">
+        <h3>🎯 Roadmap to #1</h3>
+        <button class="btn-ai" id="aiRewriteBtn" onclick="runAiRewrite()">✨ AI: Rewrite my listing</button>
+      </div>
+      <p class="roadmap-summary" id="roadmapSummary"></p>
+      <div id="roadmapSteps"></div>
+      <div class="ai-result" id="aiResult" style="display:none"></div>
     </div>
 
     <div class="grid-2">
@@ -279,26 +424,27 @@
         <h3>Score Breakdown</h3>
         <div id="scoreBreakdown"></div>
       </div>
-
-      <!-- Live competitors found -->
+      <!-- Competitors -->
       <div class="section">
         <h3 id="competitorListTitle">Top Competitors Found</h3>
         <div id="competitorList"></div>
       </div>
     </div>
 
+    <!-- Image comparison -->
+    <div class="section" id="imageCompareSection" style="display:none;margin-bottom:20px">
+      <h3>Image Comparison — Our Listing vs Top Competitor</h3>
+      <div class="img-compare-wrap" id="imageCompareGrid"></div>
+      <div class="img-verdict" id="imageVerdict" style="margin-top:12px"></div>
+    </div>
+
     <!-- Gap table -->
     <div class="section" style="margin-bottom:20px">
-      <h3>Your Listing vs Competitors</h3>
+      <h3>Our Listing vs Competitors</h3>
       <table class="gap-table">
         <thead>
           <tr>
-            <th>Factor</th>
-            <th>Yours</th>
-            <th>Top #1</th>
-            <th>Avg (Top 5)</th>
-            <th>Gap vs Avg</th>
-            <th>Status</th>
+            <th>Factor</th><th>Ours</th><th>Top #1</th><th>Avg (Top 5)</th><th>Gap</th><th>Status</th>
           </tr>
         </thead>
         <tbody id="gapTableBody"></tbody>
@@ -306,14 +452,11 @@
     </div>
 
     <div class="grid-2">
-      <!-- Missing keywords -->
       <div class="section">
         <h3>Missing Keywords</h3>
-        <p style="font-size:0.8rem;color:#888;margin-bottom:12px">Used by 2+ competitors, missing from your listing</p>
+        <p style="font-size:0.8rem;color:#888;margin-bottom:12px">Used by 2+ competitors, missing from our listing</p>
         <div class="kw-list" id="missingKeywords"></div>
       </div>
-
-      <!-- Priority actions -->
       <div class="section">
         <h3>Priority Actions</h3>
         <div id="actionList"></div>
@@ -325,181 +468,312 @@
   <!-- Empty state -->
   <div class="empty" id="emptyState">
     <div class="icon">🔍</div>
-    <p>Select a product from your website and click <strong>Analyze</strong><br>to see live competitor data from Amazon.</p>
+    <p>Select one of your listings from the dropdown above<br>and click <strong>Analyze</strong> to see competitor comparison.</p>
   </div>
 
 </div>
 
 <script>
-let allProducts = [];
+let allProducts = { amazon: [], blinkit: [] };
 let selectedProduct = null;
-let ddOpen = false;
+let currentTab = "amazon";
 
-// ── Load products on page load ──────────────────────────────────────────────
 window.onload = () => loadProducts();
 
 async function loadProducts() {
-  const searchInput = document.getElementById("productSearch");
-  const syncDot = document.getElementById("syncDot");
-  const syncMsg = document.getElementById("syncMsg");
-
-  // Reset state
-  searchInput.placeholder = "Syncing products...";
-  searchInput.readOnly = true;
+  const input = document.getElementById("productSearch");
+  input.placeholder = "Loading products...";
+  input.readOnly = true;
   document.getElementById("analyzeBtn").disabled = true;
-  syncDot.className = "sync-dot syncing";
-  syncMsg.innerHTML = "Syncing products from <strong>lazerbelieve.com</strong>...";
 
   try {
-    const res = await fetch("/api/products");
+    const res  = await fetch("/api/products");
     const data = await res.json();
+    if (data.error) { showStatus("error", data.error); return; }
 
-    if (data.error) {
-      syncDot.className = "sync-dot error";
-      syncMsg.innerHTML = `Sync failed: ${data.error}`;
-      showStatus("error", data.error);
-      return;
+    allProducts.amazon  = data.amazon  || [];
+    allProducts.blinkit = data.blinkit || [];
+
+    // Update counts in the bar
+    document.getElementById("amazonCount").textContent  = allProducts.amazon.length;
+    document.getElementById("blinkitCount").textContent = allProducts.blinkit.length;
+    document.getElementById("totalCount").textContent   = allProducts.amazon.length + allProducts.blinkit.length;
+
+    const unscraped = (data.unscraped_amazon || 0) + (data.unscraped_blinkit || 0);
+    if (unscraped > 0) {
+      document.getElementById("catalogMsg").textContent =
+        `⚠ ${unscraped} titles pending — run "python scrape_catalog.py" to enrich`;
     }
 
-    allProducts = data.products;
-    const count = data.count;
-    const lastSynced = data.last_synced;
-
-    searchInput.placeholder = `Search from ${count} products...`;
-    searchInput.readOnly = false;
-    renderDropdown(allProducts, "");
-
-    // Update sync bar
-    syncDot.className = "sync-dot synced";
-    syncMsg.innerHTML = `<strong>${count} products</strong> synced from lazerbelieve.com &nbsp;·&nbsp; Last updated: <strong>${lastSynced}</strong>`;
-
-    hideStatus();
+    renderDropdown(allProducts[currentTab], "");
+    input.placeholder = `Search from ${allProducts[currentTab].length} listings...`;
+    input.readOnly = false;
   } catch (err) {
-    syncDot.className = "sync-dot error";
-    syncMsg.textContent = "Sync failed — could not reach lazerbelieve.com";
     showStatus("error", "Failed to load products: " + err.message);
   }
 }
 
-async function refreshProducts() {
-  const btn = document.getElementById("refreshBtn");
-  btn.textContent = "Syncing...";
+// ── Excel sync / upload + batch scrape ───────────────────────────────────────
+async function syncFromExcel() {
+  const btn = document.getElementById("syncBtn");
   btn.disabled = true;
-  // Clear current selection
+  btn.textContent = "Syncing…";
+  document.getElementById("syncProgress").textContent = "Reading Excel from Downloads…";
+  try {
+    const res = await fetch("/api/sync-excel", { method: "POST" });
+    await handleMergeResult(await res.json());
+  } catch (e) {
+    document.getElementById("syncProgress").textContent = "✗ Error: " + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "⟳ Sync from Downloads";
+  }
+}
+
+async function uploadExcel(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const label = document.getElementById("uploadLabel");
+  const prog = document.getElementById("syncProgress");
+  label.classList.add("busy");
+  prog.textContent = `Uploading ${file.name}…`;
+
+  try {
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/upload-excel", { method: "POST", body: fd });
+    await handleMergeResult(await res.json());
+  } catch (e) {
+    prog.textContent = "✗ Upload error: " + e.message;
+  } finally {
+    label.classList.remove("busy");
+    input.value = "";   // allow re-uploading the same file
+  }
+}
+
+// Shared: after a sync/upload merge, run the batch-scrape progress loop.
+async function handleMergeResult(data) {
+  const prog = document.getElementById("syncProgress");
+  if (!data.ok) { prog.textContent = "✗ " + data.error; return; }
+
+  const newCount = data.new_amazon + data.new_blinkit;
+  const pendingTotal = data.pending_amazon + data.pending_blinkit;
+
+  if (pendingTotal === 0) {
+    prog.textContent = newCount === 0
+      ? "✓ Already up to date — no new products."
+      : `✓ Added ${newCount}, all already scraped.`;
+    await loadProducts();
+    setTimeout(() => { prog.textContent = ""; }, 4000);
+    return;
+  }
+
+  prog.textContent = newCount > 0
+    ? `Added ${newCount} new — scraping ${pendingTotal} pending…`
+    : `Scraping ${pendingTotal} pending product(s)…`;
+
+  for (const platform of ["amazon", "blinkit"]) {
+    const totalPending = platform === "amazon" ? data.pending_amazon : data.pending_blinkit;
+    if (!totalPending) continue;
+    while (true) {
+      const r = await fetch("/api/scrape-batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform, batch_size: 3 }),
+      });
+      const b = await r.json();
+      if (!b.ok) { prog.textContent = "✗ " + b.error; break; }
+      prog.textContent = `Scraping ${platform}: ${totalPending - b.remaining}/${totalPending} done…`;
+      if (b.done || b.remaining === 0) break;
+    }
+  }
+
+  prog.textContent = "✓ Done — refreshing list…";
+  await loadProducts();
+  setTimeout(() => { prog.textContent = ""; }, 4000);
+}
+
+// ── Add new product ──────────────────────────────────────────────────────────
+function toggleAddBox() {
+  const box = document.getElementById("addBox");
+  const open = box.classList.toggle("open");
+  if (open) {
+    // Adapt label/placeholder to the current platform tab
+    const isAmz = currentTab === "amazon";
+    document.getElementById("addBoxLabel").textContent =
+      isAmz ? "Paste a new Amazon product URL" : "Paste a new Blinkit product URL";
+    document.getElementById("addUrlInput").placeholder =
+      isAmz ? "https://www.amazon.in/dp/..." : "https://blinkit.com/prn/.../prid/...";
+    document.getElementById("addUrlInput").focus();
+  } else {
+    document.getElementById("addUrlInput").value = "";
+    document.getElementById("addStatus").textContent = "";
+    document.getElementById("addSubmitBtn").disabled = true;
+  }
+}
+
+function onAddUrlInput() {
+  const url = document.getElementById("addUrlInput").value.trim();
+  const status = document.getElementById("addStatus");
+  const btn = document.getElementById("addSubmitBtn");
+  const isAmz = url.includes("amazon.");
+  const isBlk = url.includes("blinkit.com");
+
+  if (!url) { status.textContent = ""; btn.disabled = true; return; }
+
+  if (currentTab === "amazon" && !isAmz) {
+    status.className = "add-status err";
+    status.textContent = "⚠ This isn't an amazon.in URL (you're on the Amazon tab).";
+    btn.disabled = true;
+  } else if (currentTab === "blinkit" && !isBlk) {
+    status.className = "add-status err";
+    status.textContent = "⚠ This isn't a blinkit.com URL (you're on the Blinkit tab).";
+    btn.disabled = true;
+  } else {
+    status.className = "add-status";
+    status.textContent = "";
+    btn.disabled = !url.startsWith("http");
+  }
+}
+
+async function addProduct() {
+  const url = document.getElementById("addUrlInput").value.trim();
+  if (!url) return;
+
+  const btn = document.getElementById("addSubmitBtn");
+  const status = document.getElementById("addStatus");
+  btn.disabled = true;
+  btn.textContent = "Scraping...";
+  status.className = "add-status working";
+  const slow = currentTab === "blinkit" ? "~15s" : "~5–10s";
+  status.textContent = `⏳ Scraping the listing (${slow})... please wait.`;
+
+  try {
+    const res = await fetch("/api/add-product", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    });
+    const data = await res.json();
+
+    if (!data.ok) {
+      status.className = "add-status err";
+      status.textContent = "✗ " + (data.error || "Failed to add product.");
+      return;
+    }
+
+    const platform = data.platform;
+    const product = data.product;
+
+    // Insert (or replace) in the in-memory product list
+    const list = allProducts[platform];
+    const key = platform === "amazon" ? "asin" : "product_id";
+    const existingIdx = list.findIndex(p => p[key] === product[key]);
+    if (existingIdx >= 0) list[existingIdx] = product;
+    else list.unshift(product);
+
+    // Refresh counts
+    document.getElementById("amazonCount").textContent  = allProducts.amazon.length;
+    document.getElementById("blinkitCount").textContent = allProducts.blinkit.length;
+    document.getElementById("totalCount").textContent   = allProducts.amazon.length + allProducts.blinkit.length;
+
+    status.className = "add-status ok";
+    status.textContent = data.already_exists
+      ? "✓ Already in catalog — selected it below."
+      : `✓ Added: ${product.title.slice(0, 50)}${product.title.length > 50 ? "…" : ""}`;
+
+    // Switch to that platform tab if needed, then select the new product
+    if (currentTab !== platform) switchTab(platform);
+    renderDropdown(allProducts[platform], "");
+    const idx = allProducts[platform].findIndex(p => p[key] === product[key]);
+    if (idx >= 0) selectProduct(idx);
+
+    // Close the add box shortly after success
+    setTimeout(() => {
+      document.getElementById("addBox").classList.remove("open");
+      document.getElementById("addUrlInput").value = "";
+      status.textContent = "";
+    }, 2500);
+
+  } catch (e) {
+    status.className = "add-status err";
+    status.textContent = "✗ Network error: " + e.message;
+  } finally {
+    btn.textContent = "Scrape & Add";
+    onAddUrlInput();
+  }
+}
+
+// ── Tab switching ────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
   selectedProduct = null;
   document.getElementById("productSearch").value = "";
   document.getElementById("productBanner").style.display = "none";
   document.getElementById("analyzeBtn").disabled = true;
-  await loadProducts();
-  btn.textContent = "↻ Sync Now";
-  btn.disabled = false;
+  document.getElementById("results").style.display = "none";
+  document.getElementById("emptyState").style.display = "block";
+
+  document.getElementById("tabAmazon").className  = "tab-btn" + (tab === "amazon"  ? " active-amazon"  : "");
+  document.getElementById("tabBlinkit").className = "tab-btn" + (tab === "blinkit" ? " active-blinkit" : "");
+
+  const btn = document.getElementById("analyzeBtn");
+  btn.className = tab === "amazon" ? "btn btn-amazon" : "btn btn-blinkit";
+
+  const banner = document.getElementById("productBanner");
+  banner.className = "product-banner " + tab;
+  document.getElementById("platformBadge").className = tab === "amazon" ? "badge-amz" : "badge-blk";
+  document.getElementById("platformBadge").textContent = tab === "amazon" ? "Amazon" : "Blinkit";
+
+  document.getElementById("dropdownLabel").textContent =
+    tab === "amazon" ? "Your Amazon Listing" : "Your Blinkit Listing";
+  document.getElementById("productSearch").placeholder =
+    `Search from ${allProducts[tab].length} listings...`;
+
+  renderDropdown(allProducts[tab], "");
 }
 
-// ── Searchable dropdown ──────────────────────────────────────────────────────
-// ── Smart recommendation engine ──────────────────────────────────────────────
-
-function scoreProduct(p, q) {
-  const title = p.title.toLowerCase();
-  const category = (p.category || "").toLowerCase();
-  const keyword = (p.amazon_keyword || "").toLowerCase();
-  const queryWords = q.toLowerCase().trim().split(/\s+/).filter(Boolean);
-  let score = 0;
-  let matchType = "";   // "exact" | "starts" | "word" | "partial" | "category"
-
-  if (!q.trim()) return { score: 1, matchType: "all", highlight: p.title };
-
-  const qLower = q.toLowerCase().trim();
-
-  // Exact title match
-  if (title === qLower) { score = 100; matchType = "exact"; }
-  // Title starts with query
-  else if (title.startsWith(qLower)) { score = 90; matchType = "starts"; }
-  // All query words present in title
-  else if (queryWords.every(w => title.includes(w))) { score = 80; matchType = "word"; }
-  // Title contains the full query string
-  else if (title.includes(qLower)) { score = 70; matchType = "partial"; }
-  // Partial word matches — score by how many words match
-  else {
-    const matched = queryWords.filter(w => title.includes(w) || category.includes(w) || keyword.includes(w));
-    if (matched.length > 0) {
-      score = 40 + (matched.length / queryWords.length) * 20;
-      matchType = matched.some(w => category.includes(w)) ? "category" : "partial";
-    }
-  }
-
-  // Bonus: query word appears at start of a title word (e.g. "power" → "power bank")
-  queryWords.forEach(w => {
-    if (title.split(/\s+/).some(tw => tw.startsWith(w))) score += 5;
-  });
-
-  // Highlight matched portions
-  const highlight = highlightMatches(p.title, queryWords);
-
-  return { score, matchType, highlight };
-}
-
-function highlightMatches(title, queryWords) {
-  if (!queryWords.length) return title;
-  // Escape regex special chars in each word
-  const pattern = queryWords
-    .map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-    .join("|");
-  return title.replace(new RegExp(`(${pattern})`, "gi"), "<mark>$1</mark>");
-}
-
+// ── Dropdown ─────────────────────────────────────────────────────────────────
 function renderDropdown(products, query) {
   const list = document.getElementById("ddList");
-  const q = query.trim();
+  const q = query.trim().toLowerCase();
 
-  if (!q) {
-    // No query — show all products alphabetically
-    list.innerHTML = products.map(p => {
-      const idx = allProducts.indexOf(p);
-      const price = p.price ? `₹${p.price}` : "N/A";
-      return `<div class="dd-item" onmousedown="selectProduct(${idx})">
-        <span class="dd-title">${p.title}</span>
-        <span class="dd-meta">${price} &nbsp;·&nbsp; ${p.category}</span>
-      </div>`;
-    }).join("");
+  let filtered = products;
+  if (q) {
+    filtered = products.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      (p.asin || "").toLowerCase().includes(q) ||
+      (p.product_id || "").includes(q)
+    );
+  }
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="dd-empty">No results for "<strong>${query}</strong>"</div>`;
     return;
   }
 
-  // Score and rank every product
-  const scored = products
-    .map(p => ({ p, ...scoreProduct(p, q) }))
-    .filter(r => r.score > 0)
-    .sort((a, b) => b.score - a.score);
-
-  if (scored.length === 0) {
-    list.innerHTML = `<div class="dd-empty">No products found for "<strong>${q}</strong>"<br><small>Try a shorter keyword</small></div>`;
-    return;
-  }
-
-  const matchLabels = {
-    exact:    { text: "Exact match",   color: "#2e7d32", bg: "#e8f5e9" },
-    starts:   { text: "Best match",    color: "#1565c0", bg: "#e3f2fd" },
-    word:     { text: "All words",     color: "#6a1b9a", bg: "#f3e5f5" },
-    partial:  { text: "Related",       color: "#e65100", bg: "#fff3e0" },
-    category: { text: "Same category", color: "#00695c", bg: "#e0f2f1" },
-  };
-
-  list.innerHTML = scored.map(({ p, matchType, highlight, score }) => {
-    const idx = allProducts.indexOf(p);
-    const price = p.price ? `₹${p.price}` : "N/A";
-    const badge = matchLabels[matchType];
-    const badgeHtml = badge
-      ? `<span style="background:${badge.bg};color:${badge.color};padding:1px 7px;border-radius:99px;font-size:0.72rem;font-weight:600;margin-left:6px">${badge.text}</span>`
+  list.innerHTML = filtered.slice(0, 100).map(p => {
+    const idx = products.indexOf(p);
+    const title = q ? p.title.replace(new RegExp(`(${q})`, "gi"), "<mark>$1</mark>") : p.title;
+    const price = p.price ? `₹${p.price}` : "—";
+    const scrapeTag = !p.scraped
+      ? `<span style="background:#fff8e1;color:#92400e;padding:1px 6px;border-radius:4px;font-size:0.7rem;margin-left:4px">pending</span>`
       : "";
+    // Always show product ID in meta so every entry is unique
+    const metaId = currentTab === "amazon" ? `ASIN: ${p.asin}` : `ID: ${p.product_id}`;
+    const displayTitle = (!p.scraped && currentTab === "blinkit")
+      ? `Product #${p.product_id}`
+      : title;
     return `<div class="dd-item" onmousedown="selectProduct(${idx})">
-      <span class="dd-title">${highlight}${badgeHtml}</span>
-      <span class="dd-meta">${price} &nbsp;·&nbsp; ${p.category}</span>
+      <div class="dd-title">${displayTitle}${scrapeTag}</div>
+      <div class="dd-meta">${metaId} &nbsp;·&nbsp; ${price}</div>
     </div>`;
   }).join("");
 }
 
 function filterProducts() {
   const q = document.getElementById("productSearch").value;
-  renderDropdown(allProducts, q);
+  renderDropdown(allProducts[currentTab], q);
   document.getElementById("ddList").classList.add("open");
   selectedProduct = null;
   document.getElementById("analyzeBtn").disabled = true;
@@ -507,78 +781,76 @@ function filterProducts() {
 }
 
 function openDropdown() {
-  if (allProducts.length === 0) return;
-  renderDropdown(allProducts, document.getElementById("productSearch").value);
+  if (allProducts[currentTab].length === 0) return;
+  renderDropdown(allProducts[currentTab], document.getElementById("productSearch").value);
   document.getElementById("ddList").classList.add("open");
   document.getElementById("productSearch").readOnly = false;
-  ddOpen = true;
 }
 
 function closeDropdown() {
   setTimeout(() => {
     document.getElementById("ddList").classList.remove("open");
-    ddOpen = false;
-    // If nothing selected, restore previous text or clear
-    if (!selectedProduct) {
-      document.getElementById("productSearch").value = "";
-    }
+    if (!selectedProduct) document.getElementById("productSearch").value = "";
   }, 150);
 }
 
 function selectProduct(idx) {
-  const p = allProducts[idx];
+  const p = allProducts[currentTab][idx];
   selectedProduct = p;
-
   document.getElementById("productSearch").value = p.title;
   document.getElementById("ddList").classList.remove("open");
-  document.getElementById("keyword").value = p.amazon_keyword;
   document.getElementById("analyzeBtn").disabled = false;
 
-  // Show product banner
+  // Banner
   document.getElementById("bannerTitle").textContent = p.title;
-  document.getElementById("bannerPrice").textContent = "₹" + p.price;
-  document.getElementById("bannerImages").textContent = p.image_count;
-  document.getElementById("bannerDesc").textContent = p.description_word_count;
-  document.getElementById("bannerKw").textContent = p.amazon_keyword;
+  document.getElementById("bannerPrice").textContent   = p.price   ? "₹" + p.price   : "—";
+  document.getElementById("bannerRating").textContent  = p.rating  ? p.rating + " ⭐" : "—";
+  document.getElementById("bannerReviews").textContent = p.review_count ? p.review_count.toLocaleString() : "—";
+  document.getElementById("bannerImages").textContent  = p.image_count || "—";
+  const link = document.getElementById("bannerLink");
+  link.href = p.url;
+  link.textContent = currentTab === "amazon" ? "View on Amazon ↗" : "View on Blinkit ↗";
   document.getElementById("productBanner").style.display = "block";
 }
 
-// ── Run analysis ────────────────────────────────────────────────────────────
+// ── Analyze ──────────────────────────────────────────────────────────────────
 async function runAnalysis() {
-  const keyword = document.getElementById("keyword").value.trim();
-  const platform = document.getElementById("platform").value;
-  if (!selectedProduct || !keyword) return;
+  if (!selectedProduct) return;
 
-  const p = selectedProduct;
   const btn = document.getElementById("analyzeBtn");
   btn.disabled = true;
   btn.textContent = "Analyzing...";
   document.getElementById("results").style.display = "none";
   document.getElementById("emptyState").style.display = "none";
-  const platformLabel = { amazon: "Amazon", blinkit: "Blinkit", both: "Amazon + Blinkit" }[platform];
-  showStatus("loading", `Scraping "${keyword}" on ${platformLabel}... (30–60s)`);
+  const platLabel = currentTab === "amazon" ? "Amazon" : "Blinkit";
+  showStatus("loading", `Scraping your ${platLabel} listing & finding top competitors... (30–90s)`);
 
   try {
     const res = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product_url: p.url, keyword, platform }),
+      body: JSON.stringify({ product_url: selectedProduct.url, platform: currentTab }),
     });
     const data = await res.json();
 
-    if (!res.ok || data.error) {
-      showStatus("error", data.error || "Unknown error");
-      return;
-    }
+    if (!res.ok || data.error) { showStatus("error", data.error || "Unknown error"); return; }
+    if (data.warnings && data.warnings.length) showStatus("warn", data.warnings.join(" | "));
+    else hideStatus();
 
-    if (data.warnings && data.warnings.length > 0) {
-      showStatus("warn", data.warnings.join(" | "));
-    } else {
-      hideStatus();
+    // Update banner with freshly scraped data
+    const our = data.our_product || {};
+    if (our.title) {
+      document.getElementById("bannerTitle").textContent    = our.title;
+      document.getElementById("bannerPrice").textContent    = our.price   ? "₹" + our.price   : "—";
+      document.getElementById("bannerRating").textContent   = our.rating  ? our.rating + " ⭐" : "—";
+      document.getElementById("bannerReviews").textContent  = our.review_count ? our.review_count.toLocaleString() : "—";
+      document.getElementById("bannerImages").textContent   = our.image_count || "—";
+      // Update in-memory product
+      Object.assign(selectedProduct, { title: our.title, price: our.price,
+        rating: our.rating, review_count: our.review_count, image_count: our.image_count });
     }
 
     renderResults(data);
-
   } catch (err) {
     showStatus("error", "Network error: " + err.message);
   } finally {
@@ -587,29 +859,31 @@ async function runAnalysis() {
   }
 }
 
-// ── Render ──────────────────────────────────────────────────────────────────
+// ── Render ────────────────────────────────────────────────────────────────────
 function renderResults(data) {
-  // Score circle
   const score = data.overall_score;
+  const platLabel = currentTab === "amazon" ? "Amazon" : "Blinkit";
+
+  // Score circle
   const circle = document.getElementById("scoreCircle");
   circle.className = "score-circle " + scoreClass(score);
-  document.getElementById("scoreNum").textContent = score;
+  document.getElementById("scoreNum").textContent  = score;
   document.getElementById("scoreTitle").textContent =
     score >= 7 ? "Good Standing" : score >= 4 ? "Needs Improvement" : "Significant Gaps";
-  const platformLabel = { amazon: "Amazon", blinkit: "Blinkit", both: "Amazon + Blinkit" }[data.platform || "amazon"];
   document.getElementById("scoreDesc").textContent =
-    `Searched ${platformLabel} for "${data.search_keyword}" — compared against ${data.competitors_count || "top"} competitors. ` +
+    `Compared your ${platLabel} listing against ${data.competitors_count || "top"} competitors. ` +
     (score < 5 ? "Several critical gaps to fix." : "A few areas can still be improved.");
 
   // Score breakdown
   const labels = {
     title_keywords: "Title Keywords", image_count: "Image Count",
-    description: "Description", price: "Price Position",
-    rating: "Rating", reviews: "Reviews", bullet_points: "Bullet Points",
+    description: "Description",       price: "Price Position",
+    rating: "Rating",                 reviews: "Reviews",
+    bullet_points: "Bullet Points",
   };
   const sb = document.getElementById("scoreBreakdown");
   sb.innerHTML = "";
-  for (const [key, val] of Object.entries(data.scores)) {
+  for (const [key, val] of Object.entries(data.scores || {})) {
     const cls = val >= 7 ? "good" : val >= 4 ? "medium" : "poor";
     const color = cls === "good" ? "#4caf50" : cls === "medium" ? "#ff9800" : "#e94560";
     sb.innerHTML += `
@@ -623,44 +897,37 @@ function renderResults(data) {
   }
 
   // Competitors
+  document.getElementById("competitorListTitle").textContent =
+    `Top Competitors on ${platLabel}`;
   const compDiv = document.getElementById("competitorList");
   compDiv.innerHTML = "";
-  document.getElementById("competitorListTitle").textContent =
-    `Top Competitors Found on ${platformLabel}`;
   (data.competitors || []).forEach((c, i) => {
-    const stars = c.rating ? `⭐ ${c.rating}` : "No rating";
-    const reviews = c.review_count ? `${c.review_count.toLocaleString()} reviews` : "No reviews";
-    const price = c.price ? `₹${c.price}` : "N/A";
-    const src = c.source || c.platform || "amazon";
-    const linkLabel = src === "blinkit" ? "View on Blinkit ↗" : "View on Amazon ↗";
-    const link = c.url ? `<a class="comp-link" href="${c.url}" target="_blank">${linkLabel}</a>` : "";
-    const platformBadge = src === "blinkit"
-      ? `<span style="background:#f0fdf4;color:#166534;padding:1px 8px;border-radius:99px;font-size:0.72rem;font-weight:600;margin-left:6px">Blinkit</span>`
-      : `<span style="background:#eff6ff;color:#1e40af;padding:1px 8px;border-radius:99px;font-size:0.72rem;font-weight:600;margin-left:6px">Amazon</span>`;
+    const stars   = c.rating ? `⭐ ${c.rating}` : "No rating";
+    const reviews = c.review_count ? `${c.review_count.toLocaleString()} reviews` : "";
+    const price   = c.price ? `₹${c.price}` : "N/A";
+    const link    = c.url  ? `<a class="comp-link" href="${c.url}" target="_blank">View listing ↗</a>` : "";
     compDiv.innerHTML += `
       <div class="comp-card">
-        <h4><span class="comp-rank">#${i+1}</span> ${c.title}${platformBadge}</h4>
+        <h4><span class="comp-rank">#${i+1}</span> ${c.title}</h4>
         <div class="comp-meta">
-          <span>${price}</span>
-          <span>${stars}</span>
-          <span>${reviews}</span>
-          <span>${c.image_count || 0} images</span>
-          ${link}
+          <span>${price}</span><span>${stars}</span><span>${reviews}</span>
+          <span>${c.image_count || 0} imgs</span>${link}
         </div>
       </div>`;
   });
 
+  // Image comparison
+  renderImageComparison(data.our_product, data.competitors);
+
   // Gap table
   const tbody = document.getElementById("gapTableBody");
   tbody.innerHTML = "";
-  for (const g of data.gaps) {
+  for (const g of (data.gaps || [])) {
     const diffStr = g.diff > 0 ? `+${g.diff}` : `${g.diff}`;
     tbody.innerHTML += `
       <tr>
         <td><strong>${g.label}</strong></td>
-        <td>${g.yours}</td>
-        <td>${g.top}</td>
-        <td>${g.avg}</td>
+        <td>${g.yours}</td><td>${g.top}</td><td>${g.avg}</td>
         <td class="${g.status === 'good' ? 'diff-pos' : 'diff-neg'}">${diffStr}</td>
         <td><span class="${g.status === 'good' ? 'badge-good' : 'badge-behind'}">${g.status === 'good' ? 'Good' : 'Behind'}</span></td>
       </tr>`;
@@ -668,13 +935,13 @@ function renderResults(data) {
 
   // Missing keywords
   const kwDiv = document.getElementById("missingKeywords");
-  kwDiv.innerHTML = data.missing_keywords.length
+  kwDiv.innerHTML = (data.missing_keywords || []).length
     ? data.missing_keywords.map(k => `<span class="kw-chip">${k}</span>`).join("")
     : "<span style='color:#888;font-size:0.85rem'>No major missing keywords.</span>";
 
   // Actions
   const actDiv = document.getElementById("actionList");
-  actDiv.innerHTML = data.priority_actions.length
+  actDiv.innerHTML = (data.priority_actions || []).length
     ? data.priority_actions.map((a, i) => `
         <div class="action-item">
           <span class="action-priority priority-${a.impact}">${a.impact}</span>
@@ -685,25 +952,177 @@ function renderResults(data) {
         </div>`).join("")
     : "<p style='color:#4caf50;font-weight:600;font-size:0.9rem'>No critical gaps found!</p>";
 
+  // Roadmap to #1
+  lastAnalysis = data;
+  renderRoadmap(data.roadmap);
+
   document.getElementById("results").style.display = "block";
   document.getElementById("emptyState").style.display = "none";
   document.getElementById("results").scrollIntoView({ behavior: "smooth" });
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
+// Stash the latest analysis so the AI button can reuse it
+let lastAnalysis = null;
+
+function renderRoadmap(roadmap) {
+  const section = document.getElementById("roadmapSection");
+  if (!roadmap) { section.style.display = "none"; return; }
+
+  document.getElementById("roadmapSummary").textContent = roadmap.summary || "";
+  const steps = roadmap.steps || [];
+  document.getElementById("roadmapSteps").innerHTML = steps.map(s => {
+    const tagCls = s.impact === "high" ? "tag-high" : s.impact === "medium" ? "tag-medium" : "";
+    return `
+      <div class="roadmap-step">
+        <div class="rm-num">${s.step}</div>
+        <div class="rm-body">
+          <div class="rm-title">
+            ${s.title}
+            <span class="rm-area">${s.area}</span>
+            <span class="rm-tag ${tagCls}">${s.impact}</span>
+          </div>
+          <div class="rm-detail">${s.detail}</div>
+        </div>
+      </div>`;
+  }).join("");
+
+  // Reset AI panel for the new product
+  const ai = document.getElementById("aiResult");
+  ai.style.display = "none";
+  ai.innerHTML = "";
+  document.getElementById("aiRewriteBtn").disabled = false;
+  document.getElementById("aiRewriteBtn").textContent = "✨ AI: Rewrite my listing";
+
+  section.style.display = "block";
+}
+
+// ── AI rewrite ────────────────────────────────────────────────────────────────
+async function runAiRewrite() {
+  if (!lastAnalysis) return;
+  const btn = document.getElementById("aiRewriteBtn");
+  const panel = document.getElementById("aiResult");
+  btn.disabled = true;
+  btn.textContent = "Thinking… (Claude)";
+  panel.style.display = "block";
+  panel.innerHTML = `<p class="ai-strategy">⏳ Asking Claude to rewrite your listing to outrank competitors…</p>`;
+
+  try {
+    const res = await fetch("/api/ai-rewrite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        our_product: lastAnalysis.our_product,
+        competitors: lastAnalysis.competitors,
+        platform: lastAnalysis.platform || currentTab,
+      }),
+    });
+    const data = await res.json();
+
+    if (!data.ok) {
+      panel.innerHTML = `<p class="ai-err">${data.needs_key ? "🔑 " : "✗ "}${data.error}</p>`;
+      return;
+    }
+
+    const r = data.rewrite;
+    const bullets = (r.bullets || []).map(b => `<li>${escapeHtml(b)}</li>`).join("");
+    const kws = (r.backend_keywords || []).map(k => `<span class="ai-kw">${escapeHtml(k)}</span>`).join("");
+    panel.innerHTML = `
+      <h4>Optimized Title <button class="copy-btn" onclick="copyText(this,${JSON.stringify(JSON.stringify(r.optimized_title))})">copy</button></h4>
+      <div class="ai-title">${escapeHtml(r.optimized_title)}</div>
+      <h4>Bullet Points</h4>
+      <ul>${bullets}</ul>
+      <h4>Strategy</h4>
+      <p class="ai-strategy">${escapeHtml(r.strategy)}</p>
+      <h4>Backend Keywords</h4>
+      <div>${kws}</div>`;
+  } catch (e) {
+    panel.innerHTML = `<p class="ai-err">✗ Network error: ${e.message}</p>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "✨ AI: Rewrite again";
+  }
+}
+
+function escapeHtml(s) {
+  return String(s || "").replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function copyText(btn, jsonStr) {
+  const text = JSON.parse(jsonStr);
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = "copied!";
+    setTimeout(() => { btn.textContent = "copy"; }, 1500);
+  });
+}
+
+function renderImageComparison(ourProduct, competitors) {
+  const section = document.getElementById("imageCompareSection");
+  const grid    = document.getElementById("imageCompareGrid");
+  const verdict = document.getElementById("imageVerdict");
+
+  const ourImages  = (ourProduct || {}).image_urls || [];
+  const topComp    = (competitors || [])[0] || {};
+  const compImages = topComp.image_urls || [];
+
+  if (ourImages.length === 0 && compImages.length === 0) {
+    section.style.display = "none";
+    return;
+  }
+
+  const ourCount  = ourProduct?.image_count || ourImages.length;
+  const compCount = topComp.image_count || compImages.length;
+
+  const ourThumbsHtml = ourImages.slice(0, 8).map(src =>
+    `<img class="img-thumb" src="${src}" onerror="this.style.display='none'">`
+  ).join("") || `<span style="color:#aaa;font-size:0.82rem">No images found</span>`;
+
+  const compThumbsHtml = compImages.slice(0, 8).map(src =>
+    `<img class="img-thumb" src="${src}" onerror="this.style.display='none'">`
+  ).join("") || `<span style="color:#aaa;font-size:0.82rem">No images available</span>`;
+
+  grid.innerHTML = `
+    <div class="img-side">
+      <h4>Our Listing</h4>
+      <div class="sub">
+        ${ourProduct?.url
+          ? `<a href="${ourProduct.url}" target="_blank">${ourProduct.title || 'View ↗'}</a>`
+          : (ourProduct?.title || '—')}
+        &nbsp;·&nbsp; ${ourCount} image${ourCount !== 1 ? 's' : ''}
+      </div>
+      <div class="img-thumbs">${ourThumbsHtml}</div>
+    </div>
+    <div class="img-side">
+      <h4>Top Competitor</h4>
+      <div class="sub">
+        ${topComp.url
+          ? `<a href="${topComp.url}" target="_blank">${topComp.title || 'View ↗'}</a>`
+          : (topComp.title || '—')}
+        &nbsp;·&nbsp; ${compCount} image${compCount !== 1 ? 's' : ''}
+      </div>
+      <div class="img-thumbs">${compThumbsHtml}</div>
+    </div>`;
+
+  const diff = ourCount - compCount;
+  verdict.className = "img-verdict " + (diff >= 0 ? "good" : "behind");
+  verdict.textContent = diff >= 0
+    ? `✓ You have ${ourCount} images — on par or better than top competitor (${compCount})`
+    : `⚠ You have ${ourCount} images vs competitor's ${compCount} — add ${Math.abs(diff)} more`;
+
+  section.style.display = "block";
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 function scoreClass(s) { return s >= 7 ? "score-good" : s >= 4 ? "score-medium" : "score-poor"; }
 
 function showStatus(type, msg) {
   const box = document.getElementById("statusBox");
-  const spinner = document.getElementById("statusSpinner");
   box.className = "status-box status-" + type;
   box.style.display = "flex";
-  spinner.style.display = type === "loading" ? "block" : "none";
+  document.getElementById("statusSpinner").style.display = type === "loading" ? "block" : "none";
   document.getElementById("statusMsg").textContent = msg;
 }
-function hideStatus() {
-  document.getElementById("statusBox").style.display = "none";
-}
+function hideStatus() { document.getElementById("statusBox").style.display = "none"; }
 </script>
 </body>
 </html>

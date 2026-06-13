@@ -1,15 +1,17 @@
 # Lazer Believe — Ranking Tracker
 
-A competitor gap analysis tool that compares your products from [lazerbelieve.com](https://www.lazerbelieve.com) against top results on **Amazon** and **Blinkit** in real time.
+A competitor gap analysis tool that compares your **Amazon** and **Blinkit** listings against the top results in their category, in real time — and tells you exactly what to fix to rank #1.
 
 ---
 
 ## What It Does
 
-1. **Auto-discovers all your products** from lazerbelieve.com
-2. **Scrapes top 5 competitors** from Amazon and/or Blinkit for any product
+1. **Loads your listings** from per-platform catalogs (`amazon_catalog.json`, `blinkit_catalog.json`), built from `Active Listings Links.xlsx`
+2. **Scrapes top 5 competitors** from Amazon and/or Blinkit for any product, then **filters out off-category results and your own brand** so the comparison is apples-to-apples
 3. **Analyzes gaps** across 7 factors: keywords, images, description, bullet points, price, rating, and reviews
-4. **Shows a dashboard** with scores, gap table, missing keywords, and priority actions
+4. **Shows a dashboard** with scores, gap table, missing keywords, side-by-side image comparison, and a **🎯 Roadmap to #1** — concrete, ranked steps vs the actual #1 competitor
+5. **(Optional) AI rewrite** — with a Claude API key, rewrites your title, bullets, and backend keywords to outrank competitors
+6. **Add new products on the fly** — paste any Amazon/Blinkit URL on the dashboard; it's scraped live and added to your catalog, ready to analyze
 
 ---
 
@@ -18,15 +20,17 @@ A competitor gap analysis tool that compares your products from [lazerbelieve.co
 ```
 tracker/
 ├── app.py                        # Flask web server — main entry point
-├── analyzer.py                   # Gap scoring and priority action logic
+├── analyzer.py                   # Gap scoring, priority actions, Roadmap to #1
 ├── requirements.txt              # Python dependencies
+├── amazon_catalog.json           # Your Amazon listings (built from Excel, enriched by scraper)
+├── blinkit_catalog.json          # Your Blinkit listings
+├── build_catalog.py              # One-time: Excel → catalog JSON (placeholders)
+├── scrape_catalog.py             # Enriches catalogs with live title/price/images (resumable)
 ├── scrapers/
-│   ├── catalog.py                # Discovers all products from lazerbelieve.com
-│   ├── amazon.py                 # Scrapes Amazon India search results
-│   ├── blinkit.py                # Scrapes Blinkit via API interception
-│   └── your_product.py           # Scrapes a single product page (legacy)
+│   ├── amazon.py                 # Scrapes Amazon India search + own listings
+│   └── blinkit.py                # Scrapes Blinkit via internal-API interception
 └── templates/
-    └── dashboard.html            # Web UI
+    └── dashboard.html            # Web UI (dropdown, add-product, results, roadmap, AI)
 ```
 
 ---
@@ -47,7 +51,22 @@ playwright install chromium
 python app.py
 ```
 
-### 3. Open in browser
+### 3. (Optional) Build / refresh the catalog
+
+```bash
+python build_catalog.py     # Excel → catalog JSON (run once after updating the Excel)
+python scrape_catalog.py    # Enrich with live title/price/images (resumable; skips done)
+```
+
+### 4. (Optional) Enable AI rewrite
+
+```bash
+pip install anthropic
+set ANTHROPIC_API_KEY=sk-ant-...     # Windows (PowerShell: $env:ANTHROPIC_API_KEY="...")
+```
+Without a key, everything works except the "✨ AI: Rewrite my listing" button, which shows a prompt to set the key.
+
+### 5. Open in browser
 
 ```
 http://localhost:5000
@@ -57,20 +76,21 @@ http://localhost:5000
 
 ## How to Use
 
-1. Page loads and **automatically scans lazerbelieve.com** — all products appear in the dropdown
-2. **Select a product** — the Amazon/Blinkit search keyword is auto-filled
-3. **Choose platform** — Amazon, Blinkit, or both
-4. Click **Analyze** — wait 30–60 seconds while live data is fetched
-5. View the results:
+1. **Pick a platform tab** (Amazon / Blinkit) and **select a product** from the searchable dropdown — or click **+ Add new product** to paste a fresh URL (it's scraped and added live).
+2. Click **Analyze** — wait ~30–90 seconds while your listing and the top competitors are fetched.
+3. View the results:
 
 | Section | What it shows |
 |---|---|
 | Overall Score | 0–10 score vs competitors |
+| 🎯 Roadmap to #1 | Ranked, concrete steps vs the actual #1 competitor (exact targets) |
 | Score Breakdown | Bar chart per factor |
-| Top Competitors | Live results with price, rating, review count |
+| Top Competitors | Live results (off-category + own-brand results filtered out) |
+| Image Comparison | Your images side-by-side with the top competitor |
 | Gap Table | Your values vs Top #1 vs Average |
 | Missing Keywords | Words competitors use that you don't |
 | Priority Actions | Sorted by impact — what to fix first |
+| ✨ AI Rewrite | (with API key) Claude-rewritten title, bullets, and backend keywords |
 
 ---
 

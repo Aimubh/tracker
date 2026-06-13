@@ -10,8 +10,16 @@ debug_*.py
 debug_*.html
 blinkit_*.html
 blinkit_*.json
+!blinkit_catalog.json
 amazon_debug.html
 blinkit_snippet.txt
+
+# Runtime / scratch artifacts
+server.log
+*_links.txt
+product_catalog.json
+split_catalog.py
+templates/add_link.html
 
 # Flask
 instance/
