@@ -123,6 +123,7 @@ def api_analyze():
         from scrapers.amazon import scrape_our_amazon_listing, scrape_amazon_by_image, scrape_amazon
         from scrapers.blinkit import scrape_our_blinkit_listing, scrape_blinkit
         from analyzer import analyze
+        from matcher import pick_best_competitor, _as_int
 
         our_data = None
         competitors = []
@@ -154,10 +155,17 @@ def api_analyze():
                 if not competitors:
                     warnings.append("Image search returned no results — falling back to keyword search.")
 
-            # Step 3: fallback to keyword search
+            # Step 3: fallback to keyword search — search the FULL descriptive title
+            # first (Amazon's relevance finds the exact product), then the short
+            # keyword only if that returns nothing.
             if not competitors:
+                from matcher import search_query
+                full_q = search_query(our_data.get("title", ""))
+                if full_q:
+                    competitors = asyncio.run(scrape_amazon(full_q, max_results=5))
                 keyword = _make_keyword(our_data.get("title", ""))
-                competitors = asyncio.run(scrape_amazon(keyword, max_results=5))
+                if not competitors:
+                    competitors = asyncio.run(scrape_amazon(keyword, max_results=5))
                 if not competitors:
                     return jsonify({"error": f"No competitors found on Amazon for '{keyword}'."}), 400
 
@@ -196,15 +204,28 @@ def api_analyze():
             return jsonify({"error": "No relevant competitors left after filtering.",
                             "warnings": warnings}), 400
 
-        # Benchmark against the review leader: the competitor with the most reviews
-        # becomes #1 everywhere (gap table, image comparison, Roadmap to #1).
-        # Blinkit results carry no review data, so only re-rank Amazon.
-        if platform == "amazon" and any(c.get("review_count", 0) for c in competitors):
-            competitors.sort(key=lambda c: c.get("review_count", 0) or 0, reverse=True)
-            warnings.append(
-                f"Benchmarking against the most-reviewed competitor "
-                f"({competitors[0].get('review_count', 0):,} reviews)."
-            )
+        # Benchmark against the SAME-product, best-selling, well-rated competitor —
+        # not merely the most-reviewed result (which was often a different product).
+        # Blinkit carries no review/rating data, so only re-rank Amazon.
+        if platform == "amazon":
+            best = pick_best_competitor(our_data, competitors)
+            if best is not None:
+                # Put the chosen same-product benchmark first; it becomes #1 in the
+                # gap table, image comparison, and Roadmap to #1.
+                competitors = [best] + [c for c in competitors if c is not best]
+                warnings.append(
+                    f"Benchmarking against the best-selling same-product competitor "
+                    f"({best.get('rating', 0)}★, {_as_int(best.get('review_count', 0)):,} reviews)."
+                )
+            else:
+                # No genuine same-product peer found — say so instead of silently
+                # comparing against an unrelated product.
+                warnings.append(
+                    "No same-product competitor found in the search results — "
+                    "the comparison below may not be a like-for-like match."
+                )
+                if any(c.get("review_count", 0) for c in competitors):
+                    competitors.sort(key=lambda c: c.get("review_count", 0) or 0, reverse=True)
 
         result = analyze(our_data, competitors)
         result["warnings"]    = warnings

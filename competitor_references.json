@@ -1,0 +1,11 @@
+{
+  "_comment": "Human-verified 'accurate' competitor for a product, keyed by OUR product's ASIN. When present, the comparison uses THIS exact competitor (scraped live) instead of auto-picking. Source: manual 'accurate link' column in the reference Excel. Add more here over time to make matching more accurate — for both these products and, via learned phrases, new ones.",
+  "B0H3NWGWC7": { "accurate_asin": "B0GWJBF337", "note": "Fridge Storage Container — TEKCOOL (not a generic air-tight container)" },
+  "B0FF21TM83": { "accurate_asin": "B0DPQ6P8SC", "note": "Adjustable Strips Interlocking — KSP HOME (not a generic drawer divider)" },
+  "B0FLQ8WF2B": { "accurate_asin": "B0999G6N1Q", "note": "Jewellery Organiser PU Leather — Leather Mini Jewelry Travel Case" },
+  "B0H46G8JBD": { "accurate_asin": "B0GYG5F72W", "note": "360° Rotating Makeup Organizer 2-Tier — Asayuee" },
+  "B0FNRKKB2H": { "accurate_asin": "B0G3HR954C", "note": "Insulated Lunch Bag — SaleOn (user-confirmed correct, locked to prevent drift)" },
+  "B0FFMJRHKQ": { "accurate_asin": "B0CDRYDJ8D", "note": "Mini Travel Sewing Kit — MAPPERZ (user-confirmed correct; auto-pick had drifted to ASIORA)" },
+  "B0DK9HX9RG": { "accurate_asin": "B074KB4HVH", "note": "Polyester 7 Set Travel Organizer Bag / Packing Cubes — Styleys Packing Cubes Travel Organizer" },
+  "B0DWZF5VRV": { "accurate_asin": "B0956V6B7H", "note": "Mini Portable Jewellery Box with Mirror — TRODANCE Portable Jewelry Box" }
+}

@@ -66,6 +66,7 @@ async def _run(browser: Browser, keyword: str, max_results: int) -> list[dict]:
                 "description_word_count": len(description.split()),
                 "image_count": details.get("image_count", 1),
                 "bullet_count": details.get("bullet_count", 0),
+                "main_image_url": details.get("main_image_url", ""),
                 "keywords": keywords,
             })
             print(f"[Amazon] Done: {raw['title'][:60]}")
@@ -172,10 +173,18 @@ async def _scrape_product_page(context, url: str) -> dict:
         imgs = await page.query_selector_all("#altImages img, #imageBlock img")
         image_count = max(len(imgs), 1)
 
+        # Main/hero image (for thumbnail embedding in comparisons)
+        main_image_url = ""
+        main_img_el = await page.query_selector("#landingImage, #imgBlkFront, #main-image")
+        if main_img_el:
+            main_image_url = await main_img_el.get_attribute("src") or \
+                             await main_img_el.get_attribute("data-old-hires") or ""
+
     except Exception as e:
         print(f"[Amazon] Product page error: {e}")
         description = ""
         image_count = 1
+        main_image_url = ""
     finally:
         await page.close()
 
@@ -183,6 +192,7 @@ async def _scrape_product_page(context, url: str) -> dict:
         "description": description,
         "bullet_count": len([l for l in description.splitlines() if l.strip()]),
         "image_count": image_count,
+        "main_image_url": main_image_url,
     }
 
 
@@ -367,9 +377,34 @@ async def scrape_our_amazon_listing(url: str) -> dict:
             if review_el:
                 review_count = _parse_number(await review_el.inner_text())
 
-            # Bullet points
+            # Bullet points — try the standard "About this item" section first.
             bullets = await page.query_selector_all("#feature-bullets li span.a-list-item")
             bullet_texts = [(await b.inner_text()).strip() for b in bullets if (await b.inner_text()).strip()]
+
+            # Fallback: many listings put specs in the Product Overview table instead
+            # of bullets. Treat each "Label: Value" row as a bullet so the count and
+            # description aren't wrongly 0.
+            if not bullet_texts:
+                rows = await page.query_selector_all("#productOverview_feature_div tr")
+                for row in rows:
+                    cells = await row.query_selector_all("td, th")
+                    vals = [((await c.inner_text()).strip()) for c in cells]
+                    vals = [v for v in vals if v]
+                    if len(vals) >= 2:
+                        bullet_texts.append(": ".join(vals[:2]))
+
+            # Some listings carry their selling points only in A+ image content (no
+            # text bullets). Record that so the product isn't judged "thin" — and pull
+            # any readable A+ text as description if we still have nothing.
+            has_aplus = bool(await page.query_selector("#aplus, #aplus_feature_div, .aplus-v2"))
+            if not bullet_texts and has_aplus:
+                aplus_texts = await page.query_selector_all(
+                    "#aplus p, #aplus_feature_div p, .aplus-v2 p, #aplus h3, #aplus_feature_div h3")
+                for el in aplus_texts:
+                    t = (await el.inner_text()).strip()
+                    if t and len(t) > 3:
+                        bullet_texts.append(t)
+
             description = "\n".join(bullet_texts)
 
             # Images — get all thumbnail images + main image
@@ -405,6 +440,7 @@ async def scrape_our_amazon_listing(url: str) -> dict:
                 "description": description,
                 "description_word_count": len(description.split()),
                 "bullet_count": len(bullet_texts),
+                "has_aplus": has_aplus,
                 "image_count": len(all_images),
                 "image_urls": all_images,
                 "main_image_url": main_image_url,
